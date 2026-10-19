@@ -107,6 +107,16 @@ ul.list li:last-child{border:0}
   .who span.n{display:none}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+dialog{background:var(--coal);color:var(--ivory);border:1px solid var(--gold-lo);padding:28px;width:min(540px,92vw);max-height:92vh;overflow:auto}
+dialog::backdrop{background:rgba(0,0,0,.78)}
+#formProp{max-width:none;gap:14px}
+#formProp h3{font-size:1.7rem;margin-bottom:4px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.acts{display:flex;gap:12px;justify-content:flex-end;margin-top:6px}
+#errProp{color:var(--err);min-height:1.3em;font-size:.93rem}
+.mini{background:none;border:1px solid var(--line);color:var(--mute);padding:5px 12px;cursor:pointer;font-size:.85rem}
+.mini:hover{border-color:var(--err);color:var(--err)}
+@media (max-width:520px){.g2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -145,20 +155,17 @@ ul.list li:last-child{border:0}
     <h2>Panel de administración</h2>
     <p class="lead">Resumen general. Los datos son de ejemplo.</p>
     <div class="stats">
-      <div class="stat"><b>0</b><span>Propiedades publicadas</span></div>
+      <div class="stat"><b id="nProps">0</b><span>Propiedades publicadas</span></div>
       <div class="stat"><b id="nUsers">0</b><span>Usuarios registrados</span></div>
       <div class="stat"><b>0</b><span>Solicitudes nuevas</span></div>
     </div>
     <div class="panel">
-      <header><h3>Propiedades</h3><button class="btn" type="button">Añadir propiedad</button></header>
+      <header><h3>Propiedades</h3><button class="btn" type="button" id="btnAddProp">Añadir propiedad</button></header>
       <div class="scroll"><table>
-        <thead><tr><th>Propiedad</th><th>Ciudad</th><th>Precio</th><th>Estado</th></tr></thead>
-        <tbody>
-          <tr><td>Nombre de la propiedad</td><td>Ciudad</td><td>000.000</td><td class="st">Publicada</td></tr>
-          <tr><td>Nombre de la propiedad</td><td>Ciudad</td><td>000.000</td><td class="st">Borrador</td></tr>
-          <tr><td>Nombre de la propiedad</td><td>Ciudad</td><td>000.000</td><td class="st">Publicada</td></tr>
-        </tbody>
+        <thead><tr><th>Tipo</th><th>Ubicación</th><th>Ciudad y país</th><th>Superficie</th><th>Precio</th><th>Estado</th><th></th></tr></thead>
+        <tbody id="tbProps"><tr><td colspan="7">Cargando…</td></tr></tbody>
       </table></div>
+      <p id="msgProps" role="status" style="padding:0 22px 14px;color:var(--gold-hi);min-height:1.2em"></p>
     </div>
     <div class="panel">
       <header><h3>Usuarios y roles</h3></header>
@@ -201,6 +208,33 @@ ul.list li:last-child{border:0}
     </div>
   </div>
 </div>
+
+<dialog id="dlgProp" aria-labelledby="tProp">
+  <form id="formProp" novalidate>
+    <h3 id="tProp">Añadir propiedad</h3>
+    <label>Tipo de vivienda
+      <select name="tipo"><option>Piso</option><option>Casa</option><option>Local</option><option>Terreno</option><option>Otro</option></select>
+    </label>
+    <div class="g2">
+      <label>Metros cuadrados<input name="metros" type="number" min="1" step="0.01" inputmode="decimal"></label>
+      <label>Precio<input name="precio" type="number" min="0" step="0.01" inputmode="decimal"></label>
+    </div>
+    <div class="g2">
+      <label>Moneda<select name="moneda"><option value="EUR">Euros (€)</option><option value="USD">Dólares (USD)</option></select></label>
+      <label>Estado<select name="estado"><option value="borrador">Borrador</option><option value="publicada">Publicada</option></select></label>
+    </div>
+    <label>Ubicación (dirección o zona)<input name="ubicacion" maxlength="200"></label>
+    <div class="g2">
+      <label>Ciudad<input name="ciudad" maxlength="100"></label>
+      <label>País<input name="pais" maxlength="80"></label>
+    </div>
+    <p id="errProp" role="alert"></p>
+    <div class="acts">
+      <button class="btn" type="button" id="cancelProp">Cancelar</button>
+      <button class="btn btn-fill" type="submit" id="saveProp">Guardar</button>
+    </div>
+  </form>
+</dialog>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
@@ -246,7 +280,7 @@ async function render(){
   }
   mostrar(destino);
   if(perfil){document.querySelectorAll('[data-nombre]').forEach(function(e){e.textContent=perfil.nombre||perfil.email})}
-  if(destino==='admin')cargarUsuarios();
+  if(destino==='admin'){cargarUsuarios();cargarPropiedades()}
   if(location.hash!=='#'+destino)location.hash=destino;
 }
 window.addEventListener('hashchange',render);
@@ -277,6 +311,60 @@ async function cargarUsuarios(){
     c.appendChild(sel);tr.appendChild(a);tr.appendChild(b);tr.appendChild(c);tb.appendChild(tr);
   });
 }
+
+/* ---------- Panel de administración: propiedades ---------- */
+var dlg=document.getElementById('dlgProp'),formProp=document.getElementById('formProp'),errProp=document.getElementById('errProp');
+function dinero(n,m){try{return new Intl.NumberFormat('es-ES',{style:'currency',currency:m,maximumFractionDigits:0}).format(n)}catch(e){return n+' '+m}}
+async function cargarPropiedades(){
+  var tb=document.getElementById('tbProps'),m=document.getElementById('msgProps');
+  var r=await db.from('propiedades').select('*').order('created_at',{ascending:false});
+  tb.textContent='';m.textContent='';
+  function fila(t){var tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=7;td.textContent=t;tr.appendChild(td);tb.appendChild(tr)}
+  if(r.error){fila('No se pudo cargar la lista de propiedades. ¿Has ejecutado supabase-propiedades.sql?');return}
+  document.getElementById('nProps').textContent=r.data.filter(function(p){return p.estado==='publicada'}).length;
+  if(!r.data.length){fila('Aún no hay propiedades. Pulsa «Añadir propiedad».');return}
+  r.data.forEach(function(p){
+    var tr=document.createElement('tr');
+    [p.tipo,p.ubicacion,p.ciudad+', '+p.pais,Number(p.metros).toLocaleString('es-ES')+' m²',dinero(p.precio,p.moneda)].forEach(function(t){
+      var td=document.createElement('td');td.textContent=t;tr.appendChild(td);
+    });
+    var te=document.createElement('td'),sel=document.createElement('select');
+    [['borrador','Borrador'],['publicada','Publicada']].forEach(function(o){
+      var op=document.createElement('option');op.value=o[0];op.textContent=o[1];sel.appendChild(op);
+    });
+    sel.value=p.estado;sel.setAttribute('aria-label','Estado de la propiedad en '+p.ciudad);
+    sel.addEventListener('change',async function(){
+      var res=await db.from('propiedades').update({estado:sel.value}).eq('id',p.id);
+      if(res.error){sel.value=p.estado;m.textContent='No se pudo cambiar el estado.';return}
+      await cargarPropiedades();m.textContent='Estado actualizado.';
+    });
+    te.appendChild(sel);tr.appendChild(te);
+    var tx=document.createElement('td'),b=document.createElement('button');
+    b.type='button';b.className='mini';b.textContent='Eliminar';
+    b.addEventListener('click',async function(){
+      if(!confirm('¿Eliminar esta propiedad? No se puede deshacer.'))return;
+      var res=await db.from('propiedades').delete().eq('id',p.id);
+      if(res.error){m.textContent='No se pudo eliminar.';return}
+      await cargarPropiedades();m.textContent='Propiedad eliminada.';
+    });
+    tx.appendChild(b);tr.appendChild(tx);tb.appendChild(tr);
+  });
+}
+document.getElementById('btnAddProp').addEventListener('click',function(){formProp.reset();errProp.textContent='';dlg.showModal()});
+document.getElementById('cancelProp').addEventListener('click',function(){dlg.close()});
+formProp.addEventListener('submit',async function(ev){
+  ev.preventDefault();errProp.textContent='';
+  var x=formProp.elements;
+  var d={tipo:x.tipo.value,metros:Number(x.metros.value),ubicacion:x.ubicacion.value.trim(),ciudad:x.ciudad.value.trim(),pais:x.pais.value.trim(),precio:Number(x.precio.value),moneda:x.moneda.value,estado:x.estado.value};
+  if(!(d.metros>0)){errProp.textContent='Indica los metros cuadrados (mayor que 0).';return}
+  if(x.precio.value===''||!(d.precio>=0)){errProp.textContent='Indica un precio válido.';return}
+  if(!d.ubicacion||!d.ciudad||!d.pais){errProp.textContent='Rellena la ubicación, la ciudad y el país.';return}
+  var b=document.getElementById('saveProp');b.disabled=true;
+  var r=await db.from('propiedades').insert(d);
+  b.disabled=false;
+  if(r.error){errProp.textContent='No se pudo guardar. Comprueba los datos e inténtalo de nuevo.';return}
+  dlg.close();await cargarPropiedades();document.getElementById('msgProps').textContent='Propiedad añadida.';
+});
 
 /* ---------- Formulario: entrar o crear cuenta ---------- */
 function cambiarModo(m){
