@@ -146,6 +146,8 @@ footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mute);font-si
 .rec-note{margin-top:28px;font-size:.85rem;color:var(--mute);max-width:70ch}
 @media (max-width:900px){.rec-form{grid-template-columns:1fr 1fr}.rec-list{grid-template-columns:1fr}}
 @media (max-width:520px){.rec-form{grid-template-columns:1fr}}
+#listaProps .prop:not(.real){display:none}
+.vacio{grid-column:1/-1;color:var(--mute)}
 </style>
 </head>
 <body>
@@ -219,7 +221,7 @@ footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mute);font-si
         <h2 id="t-props">Oportunidades destacadas</h2>
         <p>Una selección de propiedades con potencial de rentabilidad. Los datos de cada tarjeta son de ejemplo.</p>
       </div>
-      <div class="props">
+      <div class="props" id="listaProps">
         <article class="prop">
           <div class="ph"><span>Foto de la propiedad<br>(4:3)</span></div>
           <h3>Nombre de la propiedad</h3>
@@ -384,6 +386,33 @@ var SUPABASE_URL='https://vxarztazgxfsgtcevnvq.supabase.co';
 var SUPABASE_ANON_KEY='sb_publishable_2O0PdHW9UxqHPkVKUY770w_FgPYPYEf';
 
 var db=(window.supabase&&SUPABASE_URL.indexOf('TU-PROYECTO')<0)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+  /* ---------- Propiedades reales (publicadas desde el panel) ---------- */
+function fmtPrecio(n,m){try{return new Intl.NumberFormat('es-ES',{style:'currency',currency:m,maximumFractionDigits:0}).format(n)}catch(e){return n+' '+m}}
+(async function(){
+  var lista=document.getElementById('listaProps');
+  if(!lista)return;
+  lista.querySelectorAll('.prop:not(.real)').forEach(function(e){e.remove()});
+  function aviso(t){
+    lista.querySelectorAll('.vacio').forEach(function(e){e.remove()});
+    var p=document.createElement('p');p.className='vacio';p.textContent=t;lista.appendChild(p);
+  }
+  aviso('Cargando propiedades…');
+  if(!db){aviso('Las propiedades se mostrarán aquí cuando conectes Supabase.');return}
+  var r=await db.rpc('propiedades_publicadas');
+  if(r.error){aviso('No hemos podido cargar las propiedades. Inténtalo de nuevo en unos minutos.');return}
+  if(!r.data.length){aviso('Muy pronto publicaremos nuevas oportunidades. Déjanos tus datos y te avisaremos.');return}
+  lista.querySelectorAll('.vacio').forEach(function(e){e.remove()});
+  r.data.forEach(function(p){
+    var c=document.createElement('article');c.className='prop real';
+    function add(tag,cls,t,parent){var e=document.createElement(tag);if(cls)e.className=cls;if(t!=null)e.textContent=t;(parent||c).appendChild(e);return e}
+    var ph=add('div','ph',null);add('span','','Foto próximamente',ph);
+    add('h3','',p.tipo+' en '+p.ciudad);
+    add('p','meta',p.ubicacion+' · '+p.pais);
+    var r1=add('div','roi',null);add('span','','Superficie',r1);add('b','',Number(p.metros).toLocaleString('es-ES')+' m²',r1);
+    var r2=add('div','roi',null);add('span','','Precio',r2);add('b','',fmtPrecio(p.precio,p.moneda),r2);
+    lista.appendChild(c);
+  });
+})();
   /* ---------- Recomendador por presupuesto ---------- */
 var rec=document.getElementById('rec'),recMsg=document.getElementById('recMsg'),recList=document.getElementById('recList');
 function dinero(n,m){try{return new Intl.NumberFormat('es-ES',{style:'currency',currency:m,maximumFractionDigits:0}).format(n)}catch(e){return n+' '+m}}
