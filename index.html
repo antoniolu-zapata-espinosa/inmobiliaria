@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Inmobiliaria de inversiones | Inicio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --black:#000;--coal:#12100c;--line:#3a3220;
+  --gold:#c9a24b;--gold-hi:#e6c978;--gold-lo:#8a6d2b;
+  --ivory:#f3ecdc;--mute:#b3a98f;
+  --serif:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --sans:"Jost","Helvetica Neue",Arial,sans-serif;
+  color-scheme:dark;box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{margin:0;background:var(--black);color:var(--ivory);font:300 17px/1.65 var(--sans)}
+img,video{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--gold-hi);outline-offset:3px}
+.wrap{width:min(1180px,100% - 48px);margin-inline:auto}
+h1,h2,h3{font-family:var(--serif);font-weight:500;line-height:1.08;margin:0}
+h1{font-size:clamp(2.8rem,6.4vw,5.4rem);letter-spacing:-.01em}
+h2{font-size:clamp(2rem,4vw,3.1rem)}
+h3{font-size:1.5rem}
+p{margin:0}
+.gold{color:var(--gold)}
+.gradient-gold{background:linear-gradient(100deg,var(--gold-lo),var(--gold-hi) 45%,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* Cabecera */
+header{position:sticky;top:0;z-index:20;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:72px;gap:24px}
+.logo{display:flex;align-items:center;gap:12px;font-family:var(--serif);font-size:1.35rem;color:var(--gold-hi)}
+.logo i{width:38px;height:38px;border:1px solid var(--gold);display:grid;place-items:center;font-style:normal;font-size:.8rem;color:var(--gold);font-family:var(--sans)}
+nav ul{display:flex;gap:30px;list-style:none;margin:0;padding:0;font-size:.95rem;color:var(--mute)}
+nav a:hover{color:var(--gold-hi)}
+.btn{display:inline-block;padding:14px 28px;font:500 .95rem var(--sans);border:1px solid var(--gold);cursor:pointer;transition:background .2s,color .2s}
+.btn-fill{background:var(--gold);color:var(--black)}
+.btn-fill:hover{background:var(--gold-hi)}
+.btn-line{color:var(--gold-hi)}
+.btn-line:hover{background:var(--gold);color:var(--black)}
+.nav .btn{padding:10px 20px}
+
+/* Marcadores de foto y vídeo */
+.ph{position:relative;display:grid;place-items:center;text-align:center;color:var(--gold-lo);
+  background:repeating-linear-gradient(135deg,var(--coal) 0 14px,#0b0a07 14px 28px);border:1px dashed var(--gold-lo);overflow:hidden}
+.ph span{font-size:.9rem;padding:16px;max-width:24ch;color:var(--mute)}
+.ph svg{display:block;margin:0 auto 10px}
+.ph img,.ph video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
+/* Vídeo superior */
+.topvideo{aspect-ratio:21/9;width:100%;border-inline:0;border-top:0;border-bottom:1px solid var(--gold-lo)}
+.topvideo .play{width:84px;height:84px}
+
+/* Portada */
+.hero{padding:72px 0 96px}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+.hero p.lead{font-size:1.15rem;color:var(--mute);max-width:46ch;margin:28px 0 36px}
+.hero-actions{display:flex;gap:14px;flex-wrap:wrap}
+.hero-photo{aspect-ratio:4/5;border-color:var(--gold)}
+.hero-photo::after{content:"";position:absolute;inset:14px;border:1px solid var(--gold-lo);opacity:.6;pointer-events:none}
+
+/* Secciones */
+section{padding:96px 0}
+.alt{background:var(--coal);border-block:1px solid var(--line)}
+.head{max-width:60ch;margin-bottom:56px}
+.head p{color:var(--mute);margin-top:16px}
+
+/* Motivos */
+.reasons{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--gold-lo)}
+.reason{padding:32px 32px 8px 0}
+.reason+.reason{padding-left:32px;border-left:1px solid var(--line)}
+.reason p{color:var(--mute);margin-top:12px}
+
+/* Propiedades */
+.props{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.prop .ph{aspect-ratio:4/3}
+.prop h3{margin-top:18px}
+.prop .meta{color:var(--mute);font-size:.95rem;margin-top:4px}
+.prop .roi{display:flex;justify-content:space-between;border-top:1px solid var(--line);margin-top:16px;padding-top:12px;font-size:.95rem}
+.prop .roi b{font-weight:500;color:var(--gold-hi)}
+.more{margin-top:48px;text-align:center}
+
+/* Vídeos */
+.videos{display:grid;grid-template-columns:1.6fr 1fr;gap:28px}
+.videos .main{aspect-ratio:16/9}
+.videos .side{display:grid;gap:28px}
+.videos .side .ph{aspect-ratio:16/9}
+.play{width:68px;height:68px;border:1px solid var(--gold);border-radius:50%;display:grid;place-items:center;margin:0 auto 12px}
+.play::before{content:"";border-left:16px solid var(--gold);border-block:10px solid transparent;margin-left:5px}
+
+/* Proceso */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:28px;counter-reset:s}
+.step{counter-increment:s;border-top:1px solid var(--gold-lo);padding-top:20px}
+.step::before{content:counter(s);font:500 2.4rem/1 var(--serif);color:var(--gold)}
+.step h3{font-size:1.25rem;margin:10px 0 8px}
+.step p{color:var(--mute);font-size:.97rem}
+
+/* Contacto */
+.contact{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start}
+.contact .ph{aspect-ratio:4/3;margin-top:32px}
+form{display:grid;gap:18px}
+label{font-size:.92rem;color:var(--mute);display:grid;gap:6px}
+input,select,textarea{font:300 1rem var(--sans);color:var(--ivory);background:var(--black);border:1px solid var(--line);padding:13px 14px;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--gold);outline:none}
+textarea{min-height:110px;resize:vertical}
+form .btn{justify-self:start}
+#ok{color:var(--gold-hi);min-height:1.5em}
+
+footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mute);font-size:.9rem}
+.foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+
+@media (max-width:900px){
+  .topvideo{aspect-ratio:16/9}
+  nav ul{display:none}
+  .hero-grid,.contact,.videos{grid-template-columns:1fr}
+  .reasons,.props{grid-template-columns:1fr}
+  .reason,.reason+.reason{padding:28px 0 8px;border-left:0}
+  .reason+.reason{border-top:1px solid var(--line)}
+  .steps{grid-template-columns:1fr 1fr}
+  .hero{padding-top:40px}
+  .hero-photo{aspect-ratio:4/3}
+  section{padding:72px 0}
+}
+@media (max-width:520px){.steps{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="logo" href="#inicio" aria-label="Inicio"><i>LOGO</i>[Nombre de la agencia]</a>
+    <nav aria-label="Principal">
+      <ul>
+        <li><a href="#propiedades">Propiedades</a></li>
+        <li><a href="#videos">Vídeos</a></li>
+        <li><a href="#proceso">Cómo trabajamos</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+      </ul>
+    </nav>
+    <a class="btn btn-line" href="#contacto">Pedir asesoría</a>
+  </div>
+</header>
+
+<main id="inicio">
+  <!-- Vídeo superior. Para añadirlo: sustituye el <span> por <video controls autoplay muted loop playsinline poster="portada.jpg" src="video.mp4"></video> o por un <iframe> de YouTube/Vimeo. Si no lo quieres, borra este bloque. -->
+  <div class="ph topvideo" aria-label="Espacio para vídeo de presentación">
+    <span><div class="play"></div>Vídeo de presentación<br>(banner superior, 21:9 o 16:9)</span>
+  </div>
+
+  <div class="wrap hero">
+    <div class="hero-grid">
+      <div>
+        <h1>Invertir en inmuebles, con <span class="gradient-gold">criterio y rentabilidad</span></h1>
+        <p class="lead">Seleccionamos, analizamos y gestionamos propiedades pensadas para generar ingresos y conservar su valor en el tiempo.</p>
+        <div class="hero-actions">
+          <a class="btn btn-fill" href="#propiedades">Ver oportunidades</a>
+          <a class="btn btn-line" href="#contacto">Hablar con un asesor</a>
+        </div>
+      </div>
+      <!-- Para añadir la foto: sustituye el <span> por <img src="tu-foto.jpg" alt="Descripción"> -->
+      <div class="ph hero-photo">
+        <span>
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="4" width="18" height="16" rx="1"/><circle cx="9" cy="10" r="2"/><path d="M3 17l5-4 4 3 3-2 6 5"/></svg>
+          Foto principal<br>(vertical, 4:5)
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <section class="alt" aria-labelledby="t-motivos">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="t-motivos">Una inversión que se entiende antes de firmar</h2>
+      </div>
+      <div class="reasons">
+        <div class="reason">
+          <h3>Análisis de cada propiedad</h3>
+          <p>Estudiamos zona, precio, costes y demanda de alquiler para que veas la rentabilidad esperada con números claros.</p>
+        </div>
+        <div class="reason">
+          <h3>Acompañamiento completo</h3>
+          <p>Desde la búsqueda hasta la compra, la reforma y el alquiler, un mismo equipo se ocupa de cada paso.</p>
+        </div>
+        <div class="reason">
+          <h3>Transparencia total</h3>
+          <p>Honorarios, riesgos y plazos explicados desde el primer día, sin letra pequeña.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="propiedades" aria-labelledby="t-props">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="t-props">Oportunidades destacadas</h2>
+        <p>Una selección de propiedades con potencial de rentabilidad. Los datos de cada tarjeta son de ejemplo.</p>
+      </div>
+      <div class="props">
+        <article class="prop">
+          <div class="ph"><span>Foto de la propiedad<br>(4:3)</span></div>
+          <h3>Nombre de la propiedad</h3>
+          <p class="meta">Ciudad · Tipo de inmueble · m²</p>
+          <div class="roi"><span>Precio</span><b>0.000 €</b></div>
+          <div class="roi"><span>Rentabilidad estimada</span><b>0,0 %</b></div>
+        </article>
+        <article class="prop">
+          <div class="ph"><span>Foto de la propiedad<br>(4:3)</span></div>
+          <h3>Nombre de la propiedad</h3>
+          <p class="meta">Ciudad · Tipo de inmueble · m²</p>
+          <div class="roi"><span>Precio</span><b>0.000 €</b></div>
+          <div class="roi"><span>Rentabilidad estimada</span><b>0,0 %</b></div>
+        </article>
+        <article class="prop">
+          <div class="ph"><span>Foto de la propiedad<br>(4:3)</span></div>
+          <h3>Nombre de la propiedad</h3>
+          <p class="meta">Ciudad · Tipo de inmueble · m²</p>
+          <div class="roi"><span>Precio</span><b>0.000 €</b></div>
+          <div class="roi"><span>Rentabilidad estimada</span><b>0,0 %</b></div>
+        </article>
+      </div>
+      <div class="more"><a class="btn btn-line" href="#contacto">Recibir el catálogo completo</a></div>
+    </div>
+  </section>
+
+  <section id="videos" class="alt" aria-labelledby="t-vid">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="t-vid">Conoce nuestras propiedades en vídeo</h2>
+        <p>Recorridos y explicaciones de nuestros proyectos.</p>
+      </div>
+      <!-- Para añadir un vídeo: sustituye el <span> por <video controls poster="portada.jpg" src="video.mp4"></video> o por un <iframe> de YouTube/Vimeo -->
+      <div class="videos">
+        <div class="ph main"><span><div class="play"></div>Vídeo principal<br>(16:9)</span></div>
+        <div class="side">
+          <div class="ph"><span><div class="play"></div>Vídeo 2</span></div>
+          <div class="ph"><span><div class="play"></div>Vídeo 3</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="proceso" aria-labelledby="t-proc">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="t-proc">Cómo trabajamos</h2>
+      </div>
+      <div class="steps">
+        <div class="step"><h3>Conversación inicial</h3><p>Definimos tu presupuesto, objetivos y plazo de inversión.</p></div>
+        <div class="step"><h3>Selección</h3><p>Te presentamos propiedades que encajan, con su análisis de rentabilidad.</p></div>
+        <div class="step"><h3>Compra</h3><p>Negociamos y gestionamos la documentación hasta la firma.</p></div>
+        <div class="step"><h3>Gestión</h3><p>Reforma, alquiler y seguimiento para que tu inversión rinda.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contacto" class="alt" aria-labelledby="t-con">
+    <div class="wrap contact">
+      <div>
+        <h2 id="t-con">Empecemos por una conversación</h2>
+        <p style="color:var(--mute);margin-top:16px;max-width:44ch">Cuéntanos qué buscas y un asesor te contactará para estudiar tu caso sin compromiso.</p>
+        <div class="ph"><span>Foto del equipo o de la oficina<br>(4:3)</span></div>
+      </div>
+      <form id="f" novalidate>
+        <label>Nombre<input name="n" autocomplete="name" required></label>
+        <label>Correo electrónico<input type="email" name="e" autocomplete="email" required></label>
+        <label>Teléfono<input type="tel" name="t" autocomplete="tel"></label>
+        <label>Presupuesto aproximado
+          <select name="p">
+            <option>Menos de 100.000 €</option>
+            <option>100.000 € – 300.000 €</option>
+            <option>300.000 € – 1.000.000 €</option>
+            <option>Más de 1.000.000 €</option>
+          </select>
+        </label>
+        <label>Mensaje<textarea name="m"></textarea></label>
+        <button class="btn btn-fill" type="submit">Enviar solicitud</button>
+        <p id="ok" role="status"></p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>© 2026 [Nombre de la agencia]. Todos los derechos reservados.</span>
+    <span>Aviso legal · Privacidad · Cookies</span>
+  </div>
+</footer>
+
+<script>
+document.getElementById('f').addEventListener('submit',function(ev){
+  ev.preventDefault();
+  var ok=document.getElementById('ok');
+  if(!this.n.value.trim()||!this.e.value.trim()){ok.textContent='Escribe tu nombre y tu correo para poder responderte.';return;}
+  ok.textContent='Solicitud lista. Cuando conectemos el formulario, llegará a tu equipo.';
+  this.reset();
+});
+</script>
+</body>
+</html>
