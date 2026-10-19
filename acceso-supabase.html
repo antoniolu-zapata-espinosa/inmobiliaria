@@ -298,6 +298,7 @@ f.addEventListener('submit',async function(ev){
   if(!db){render();return}
   var email=document.getElementById('email').value.trim(),pass=document.getElementById('pass').value;
   if(!email||!pass){aviso('Escribe tu correo y tu contraseña.');return}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){aviso('Escribe un correo válido, por ejemplo nombre@correo.com.');return}
   go.disabled=true;go.textContent='Un momento…';
   try{
     if(modo==='login'){
