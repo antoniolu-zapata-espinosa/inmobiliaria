@@ -132,6 +132,20 @@ footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mute);font-si
 @media (max-width:520px){.steps{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
 .tel{display:grid;grid-template-columns:minmax(130px,42%) 1fr;gap:10px}
+.rec-form{display:grid;grid-template-columns:1.3fr .8fr 1fr auto;gap:14px;align-items:end;border:1px solid var(--line);background:var(--coal);padding:24px}
+.rec-form .btn{height:48px}
+#recMsg{margin:22px 0 8px;color:var(--gold-hi);min-height:1.5em}
+.rec-list{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.rec-card{border:1px solid var(--line);background:var(--coal);padding:22px;display:grid;gap:6px;align-content:start}
+.rec-card .tag{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold)}
+.rec-card h3{font-size:1.5rem}
+.rec-card .pr{font:500 1.8rem var(--serif);color:var(--gold-hi)}
+.rec-card p{color:var(--mute);font-size:.95rem}
+.rec-card .why{border-top:1px solid var(--line);margin-top:8px;padding-top:10px}
+.rec-card .btn{justify-self:start;margin-top:10px;padding:10px 20px}
+.rec-note{margin-top:28px;font-size:.85rem;color:var(--mute);max-width:70ch}
+@media (max-width:900px){.rec-form{grid-template-columns:1fr 1fr}.rec-list{grid-template-columns:1fr}}
+@media (max-width:520px){.rec-form{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -232,6 +246,23 @@ footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mute);font-si
     </div>
   </section>
 
+  <section id="recomendador" aria-labelledby="t-rec">
+    <div class="wrap">
+      <div class="head">
+        <h2 id="t-rec">Encuentra tu inversión ideal</h2>
+        <p>Dinos con cuánto cuentas y te mostramos solo las propiedades que encajan con tu perfil.</p>
+      </div>
+      <form id="rec" class="rec-form" novalidate>
+        <label>Presupuesto disponible<input name="b" type="number" min="1" step="1" inputmode="numeric" placeholder="Ej. 150000"></label>
+        <label>Moneda<select name="m"><option value="EUR">Euros (€)</option><option value="USD">Dólares (USD)</option></select></label>
+        <label>Tipo (opcional)<select name="t"><option value="">Cualquiera</option><option>Piso</option><option>Casa</option><option>Local</option><option>Terreno</option><option>Otro</option></select></label>
+        <button class="btn btn-fill" type="submit">Ver recomendaciones</button>
+      </form>
+      <p id="recMsg" role="status"></p>
+      <div id="recList" class="rec-list"></div>
+      <p class="rec-note">Reservamos un margen del 10 % de tu presupuesto para los gastos de compra (impuestos, notaría, etc.). Las recomendaciones son orientativas y no constituyen asesoramiento financiero.</p>
+    </div>
+  </section>
   <section id="videos" class="alt" aria-labelledby="t-vid">
     <div class="wrap">
       <div class="head">
@@ -353,6 +384,31 @@ var SUPABASE_URL='https://vxarztazgxfsgtcevnvq.supabase.co';
 var SUPABASE_ANON_KEY='sb_publishable_2O0PdHW9UxqHPkVKUY770w_FgPYPYEf';
 
 var db=(window.supabase&&SUPABASE_URL.indexOf('TU-PROYECTO')<0)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+  /* ---------- Recomendador por presupuesto ---------- */
+var rec=document.getElementById('rec'),recMsg=document.getElementById('recMsg'),recList=document.getElementById('recList');
+function dinero(n,m){try{return new Intl.NumberFormat('es-ES',{style:'currency',currency:m,maximumFractionDigits:0}).format(n)}catch(e){return n+' '+m}}
+rec.addEventListener('submit',async function(ev){
+  ev.preventDefault();recList.textContent='';
+  var x=rec.elements,b=Number(x.b.value);
+  if(!(b>0)){recMsg.textContent='Indica el presupuesto con el que cuentas.';return}
+  if(!db){recMsg.textContent='El recomendador aún no está conectado: falta configurar Supabase.';return}
+  recMsg.textContent='Buscando las mejores opciones…';
+  var r=await db.rpc('recomendar_propiedades',{p_presupuesto:b,p_moneda:x.m.value,p_tipo:x.t.value||null});
+  if(r.error){recMsg.textContent='No hemos podido cargar las recomendaciones. Inténtalo de nuevo en unos minutos.';return}
+  if(!r.data.length){recMsg.textContent='De momento no tenemos propiedades que encajen con ese presupuesto. Déjanos tus datos en el formulario de contacto y te avisaremos.';return}
+  recMsg.textContent='Estas son las propiedades que mejor encajan con tu presupuesto de '+dinero(b,x.m.value)+':';
+  r.data.forEach(function(p){
+    var c=document.createElement('article');c.className='rec-card';
+    function add(tag,cls,t){var e=document.createElement(tag);if(cls)e.className=cls;e.textContent=t;c.appendChild(e)}
+    add('span','tag',p.ajuste==='ideal'?'Recomendada para tu perfil':'Ajustada a tu presupuesto');
+    add('h3','',p.tipo+' en '+p.ciudad);
+    add('p','',p.ubicacion+' · '+p.pais+' · '+Number(p.metros).toLocaleString('es-ES')+' m²');
+    add('div','pr',dinero(p.precio,p.moneda));
+    add('p','why',p.ajuste==='ideal'?'Te deja margen para los gastos de compra.':'Está cerca de tu límite: tendrías poco margen para los gastos.');
+    var a=document.createElement('a');a.className='btn btn-line';a.href='#contacto';a.textContent='Pedir información';c.appendChild(a);
+    recList.appendChild(c);
+  });
+});
 var f=document.getElementById('f'),ok=document.getElementById('ok'),btn=f.querySelector('button[type=submit]');
 f.addEventListener('submit',async function(ev){
   ev.preventDefault();
