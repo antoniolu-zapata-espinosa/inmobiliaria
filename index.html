@@ -273,6 +273,7 @@ footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mute);font-si
         <label>Nombre<input name="n" autocomplete="name" required></label>
         <label>Correo electrónico<input type="email" name="e" autocomplete="email" required></label>
         <label>Teléfono<input type="tel" name="t" autocomplete="tel"></label>
+        <label>País de residencia<input name="pa" autocomplete="country-name"></label>
         <label>Presupuesto aproximado
           <select name="p">
             <option>Menos de 100.000 €</option>
@@ -309,7 +310,7 @@ var f=document.getElementById('f'),ok=document.getElementById('ok'),btn=f.queryS
 f.addEventListener('submit',async function(ev){
   ev.preventDefault();
   var x=f.elements;
-  var d={nombre:x.n.value.trim(),email:x.e.value.trim(),telefono:x.t.value.trim()||null,presupuesto:x.p.value,mensaje:x.m.value.trim()||null};
+  var d={nombre:x.n.value.trim(),email:x.e.value.trim(),telefono:x.t.value.trim()||null,pais:x.pa.value.trim()||null,presupuesto:x.p.value,mensaje:x.m.value.trim()||null};
   if(!d.nombre||d.email.indexOf('@')<1){ok.textContent='Escribe tu nombre y un correo válido para poder responderte.';return}
   if(x.web.value){ok.textContent='Gracias, hemos recibido tu solicitud.';f.reset();return}
   if(!db){ok.textContent='El formulario aún no está conectado: falta configurar Supabase.';return}
