@@ -44,6 +44,7 @@ nav a:hover{color:var(--gold-hi)}
 .btn-fill:hover{background:var(--gold-hi)}
 .btn-line{color:var(--gold-hi)}
 .btn-line:hover{background:var(--gold);color:var(--black)}
+.nav-acts{display:flex;gap:10px;align-items:center}
 .nav .btn{padding:10px 20px}
 
 /* Marcadores de foto y vídeo */
@@ -117,6 +118,7 @@ footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mute);font-si
 
 @media (max-width:900px){
   .topvideo{aspect-ratio:16/9}
+  .nav-acts .btn-line{display:none}
   nav ul{display:none}
   .hero-grid,.contact,.videos{grid-template-columns:1fr}
   .reasons,.props{grid-template-columns:1fr}
@@ -144,7 +146,7 @@ footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mute);font-si
         <li><a href="#contacto">Contacto</a></li>
       </ul>
     </nav>
-    <a class="btn btn-line" href="#contacto">Pedir asesoría</a>
+    <div class="nav-acts"><a class="btn btn-line" href="#contacto">Pedir asesoría</a><a class="btn btn-fill" href="acceso-supabase.html">Acceder</a></div>
   </div>
 </header>
 
@@ -280,6 +282,7 @@ footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mute);font-si
           </select>
         </label>
         <label>Mensaje<textarea name="m"></textarea></label>
+        <input name="web" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
         <button class="btn btn-fill" type="submit">Enviar solicitud</button>
         <p id="ok" role="status"></p>
       </form>
@@ -294,13 +297,28 @@ footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mute);font-si
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
-document.getElementById('f').addEventListener('submit',function(ev){
+/* Pon aquí los MISMOS valores que en acceso-supabase.html
+   (Supabase > Project Settings). Solo la clave pública, nunca la secret. */
+var SUPABASE_URL='https://TU-PROYECTO.supabase.co';
+var SUPABASE_ANON_KEY='TU-CLAVE-PUBLICA';
+
+var db=(window.supabase&&SUPABASE_URL.indexOf('TU-PROYECTO')<0)?window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+var f=document.getElementById('f'),ok=document.getElementById('ok'),btn=f.querySelector('button[type=submit]');
+f.addEventListener('submit',async function(ev){
   ev.preventDefault();
-  var ok=document.getElementById('ok');
-  if(!this.n.value.trim()||!this.e.value.trim()){ok.textContent='Escribe tu nombre y tu correo para poder responderte.';return;}
-  ok.textContent='Solicitud lista. Cuando conectemos el formulario, llegará a tu equipo.';
-  this.reset();
+  var x=f.elements;
+  var d={nombre:x.n.value.trim(),email:x.e.value.trim(),telefono:x.t.value.trim()||null,presupuesto:x.p.value,mensaje:x.m.value.trim()||null};
+  if(!d.nombre||d.email.indexOf('@')<1){ok.textContent='Escribe tu nombre y un correo válido para poder responderte.';return}
+  if(x.web.value){ok.textContent='Gracias, hemos recibido tu solicitud.';f.reset();return}
+  if(!db){ok.textContent='El formulario aún no está conectado: falta configurar Supabase.';return}
+  btn.disabled=true;var t=btn.textContent;btn.textContent='Enviando…';
+  var r=await db.from('solicitudes').insert(d);
+  btn.disabled=false;btn.textContent=t;
+  if(r.error){ok.textContent='No hemos podido enviar tu solicitud. Inténtalo de nuevo en unos minutos.';return}
+  ok.textContent='Gracias, hemos recibido tu solicitud. Te contactaremos pronto.';
+  f.reset();
 });
 </script>
 </body>
