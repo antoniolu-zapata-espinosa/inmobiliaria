@@ -425,10 +425,16 @@ function fmtPrecio(n,m){try{return new Intl.NumberFormat('es-ES',{style:'currenc
         });
       }
     }else{add('span','','Foto próximamente',ph)}
-    add('h3','',p.tipo+' en '+p.ciudad);
-    add('p','meta',p.ubicacion+' · '+p.pais);
-    var r1=add('div','roi',null);add('span','','Superficie',r1);add('b','',Number(p.metros).toLocaleString('es-ES')+' m²',r1);
-    var r2=add('div','roi',null);add('span','','Precio',r2);add('b','',fmtPrecio(p.precio,p.moneda),r2);
+    add('p','meta',(p.operacion==='alquiler'?'En alquiler':'En venta')+(p.codigo?' · Cód. '+p.codigo:''));
+add('h3','',p.tipo+' en '+p.ciudad);
+add('p','meta',p.ubicacion+' · '+p.pais);
+var det=[Number(p.metros).toLocaleString('es-ES')+' m² construidos',(p.habitaciones||0)+' hab.',(p.banos||0)+' baños'];
+if(p.garaje)det.push('Garaje');
+if(p.trastero)det.push('Trastero');
+if(p.condicion)det.push(p.condicion==='nuevo'?'Nuevo':'Usado');
+if(p.anio_construccion)det.push('Año '+p.anio_construccion);
+add('p','meta',det.join(' · '));
+var r2=add('div','roi',null);add('span','',p.operacion==='alquiler'?'Alquiler al mes':'Precio',r2);add('b','',fmtPrecio(p.precio,p.moneda),r2);
     lista.appendChild(c);
   });
 })();
@@ -452,6 +458,7 @@ rec.addEventListener('submit',async function(ev){
     add('span','tag',p.ajuste==='ideal'?'Recomendada para tu perfil':'Ajustada a tu presupuesto');
     add('h3','',p.tipo+' en '+p.ciudad);
     add('p','',p.ubicacion+' · '+p.pais+' · '+Number(p.metros).toLocaleString('es-ES')+' m²');
+    add('p','',(p.habitaciones||0)+' hab. · '+(p.banos||0)+' baños'+(p.garaje?' · Garaje':'')+(p.trastero?' · Trastero':''));
     add('div','pr',dinero(p.precio,p.moneda));
     add('p','why',p.ajuste==='ideal'?'Te deja margen para los gastos de compra.':'Está cerca de tu límite: tendrías poco margen para los gastos.');
     var a=document.createElement('a');a.className='btn btn-line';a.href='#contacto';a.textContent='Pedir información';c.appendChild(a);
