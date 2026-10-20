@@ -157,6 +157,7 @@ footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mute);font-si
 .test-cta h3{font-size:2rem;margin:8px 0 12px}
 .test-cta p{color:var(--mute);margin-bottom:24px}
 .test-cta .kicker-t{font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0}
+.prop .desc{color:var(--mute);font-size:.95rem;margin-top:8px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 </style>
 </head>
 <body>
@@ -444,6 +445,7 @@ if(p.trastero)det.push('Trastero');
 if(p.condicion)det.push(p.condicion==='nuevo'?'Nuevo':'Usado');
 if(p.anio_construccion)det.push('Año '+p.anio_construccion);
 add('p','meta',det.join(' · '));
+    if(p.descripcion)add('p','desc',p.descripcion);
 var r2=add('div','roi',null);add('span','',p.operacion==='alquiler'?'Alquiler al mes':'Precio',r2);add('b','',fmtPrecio(p.precio,p.moneda),r2);
     lista.appendChild(c);
   });
