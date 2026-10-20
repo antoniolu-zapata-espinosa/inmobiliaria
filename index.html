@@ -153,6 +153,10 @@ footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mute);font-si
 .thumbs button[aria-current="true"]{border-color:var(--gold);opacity:1}
 .thumbs img{width:100%;height:100%;object-fit:cover}
 .rec-foto{width:100%;aspect-ratio:4/3;object-fit:cover;margin-bottom:8px}
+.test-cta{border:1px solid var(--gold-lo);background:var(--coal);padding:40px;text-align:center}
+.test-cta h3{font-size:2rem;margin:8px 0 12px}
+.test-cta p{color:var(--mute);margin-bottom:24px}
+.test-cta .kicker-t{font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:0}
 </style>
 </head>
 <body>
@@ -168,7 +172,7 @@ footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mute);font-si
         <li><a href="#contacto">Contacto</a></li>
       </ul>
     </nav>
-    <div class="nav-acts"><a class="btn btn-line" href="#contacto">Pedir asesoría</a><a class="btn btn-fill" href="acceso-supabase.html">Acceder</a></div>
+    <div class="nav-acts"><a class="btn btn-line" href="perfil-inversion.html">Descubre tu perfil</a><a class="btn btn-fill" href="acceso-supabase.html">Acceder</a></div>
   </div>
 </header>
 
@@ -185,7 +189,7 @@ footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mute);font-si
         <p class="lead">Seleccionamos, analizamos y gestionamos propiedades pensadas para generar ingresos y conservar su valor en el tiempo.</p>
         <div class="hero-actions">
           <a class="btn btn-fill" href="#propiedades">Ver oportunidades</a>
-          <a class="btn btn-line" href="#contacto">Hablar con un asesor</a>
+         <a class="btn btn-line" href="perfil-inversion.html">Descubre tu perfil de inversión</a>
         </div>
       </div>
       <!-- Para añadir la foto: sustituye el <span> por <img src="tu-foto.jpg" alt="Descripción"> -->
@@ -308,7 +312,13 @@ footer{border-top:1px solid var(--line);padding:40px 0;color:var(--mute);font-si
         <p style="color:var(--mute);margin-top:16px;max-width:44ch">Cuéntanos qué buscas y un asesor te contactará para estudiar tu caso sin compromiso.</p>
         <div class="ph"><span>Foto del equipo o de la oficina<br>(4:3)</span></div>
       </div>
-      <form id="f" novalidate>
+      <div class="test-cta">
+        <p class="kicker-t">Test de inversor · 2 minutos</p>
+        <h3>Descubre tu perfil de inversión</h3>
+        <p>Responde cuatro preguntas y te mostramos la propiedad que mejor encaja contigo.</p>
+        <a class="btn btn-fill" href="perfil-inversion.html">Comenzar el test</a>
+      </div>
+      <form id="f" novalidate hidden>
         <label>Nombre<input name="n" autocomplete="name" required></label>
         <label>Correo electrónico<input type="email" name="e" autocomplete="email" required></label>
         <label>Teléfono
