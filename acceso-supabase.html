@@ -164,8 +164,8 @@ dialog::backdrop{background:rgba(0,0,0,.78)}
     <div class="panel">
       <header><h3>Propiedades</h3><button class="btn" type="button" id="btnAddProp">Añadir propiedad</button></header>
       <div class="scroll"><table>
-        <thead><tr><th>Foto</th><th>Tipo</th><th>Ubicación</th><th>Ciudad y país</th><th>Superficie</th><th>Precio</th><th>Estado</th><th></th></tr></thead>
-        <tbody id="tbProps"><tr><td colspan="8">Cargando…</td></tr></tbody>
+        <thead><tr><th>Foto</th><th>Código</th><th>Tipo</th><th>Ubicación</th><th>Ciudad y país</th><th>Superficie</th><th>Precio</th><th>Estado</th><th></th></tr></thead>
+        <tbody id="tbProps"><tr><td colspan="9">Cargando…</td></tr></tbody>
       </table></div>
       <p id="msgProps" role="status" style="padding:0 22px 14px;color:var(--gold-hi);min-height:1.2em"></p>
     </div>
@@ -214,17 +214,31 @@ dialog::backdrop{background:rgba(0,0,0,.78)}
 <dialog id="dlgProp" aria-labelledby="tProp">
   <form id="formProp" novalidate>
     <h3 id="tProp">Añadir propiedad</h3>
-    <label>Tipo de vivienda
-      <select name="tipo"><option>Piso</option><option>Casa</option><option>Local</option><option>Terreno</option><option>Otro</option></select>
-    </label>
     <div class="g2">
-      <label>Metros cuadrados<input name="metros" type="number" min="1" step="0.01" inputmode="decimal"></label>
-      <label>Precio<input name="precio" type="number" min="0" step="0.01" inputmode="decimal"></label>
+      <label>Código<input name="codigo" maxlength="30" placeholder="Ej. INM-001"></label>
+      <label>Operación<select name="operacion"><option value="venta">Venta</option><option value="alquiler">Alquiler</option></select></label>
     </div>
     <div class="g2">
+      <label>Tipo de inmueble<select name="tipo"><option>Casa</option><option>Piso</option><option>Apartamento</option><option>Local</option><option>Oficina</option><option>Terreno</option><option>Otro</option></select></label>
+      <label>Condición<select name="condicion"><option value="nuevo">Nuevo</option><option value="usado">Usado</option></select></label>
+    </div>
+    <div class="g2">
+      <label>Área construida (m²)<input name="metros" type="number" min="1" step="0.01" inputmode="decimal"></label>
+      <label>Año de construcción<input name="anio" type="number" min="1800" max="2100" step="1" inputmode="numeric"></label>
+    </div>
+    <div class="g2">
+      <label>Habitaciones<input name="habitaciones" type="number" min="0" max="50" step="1" inputmode="numeric"></label>
+      <label>Baños<input name="banos" type="number" min="0" max="50" step="1" inputmode="numeric"></label>
+    </div>
+    <div class="g2">
+      <label>Garaje<select name="garaje"><option value="no">No</option><option value="si">Sí</option></select></label>
+      <label>Trastero<select name="trastero"><option value="no">No</option><option value="si">Sí</option></select></label>
+    </div>
+    <div class="g2">
+      <label>Precio (en alquiler, al mes)<input name="precio" type="number" min="0" step="0.01" inputmode="decimal"></label>
       <label>Moneda<select name="moneda"><option value="EUR">Euros (€)</option><option value="USD">Dólares (USD)</option></select></label>
-      <label>Estado<select name="estado"><option value="borrador">Borrador</option><option value="publicada">Publicada</option></select></label>
     </div>
+    <label>Estado de publicación<select name="estado"><option value="borrador">Borrador</option><option value="publicada">Publicada</option></select></label>
     <label>Ubicación (dirección o zona)<input name="ubicacion" maxlength="200"></label>
     <div class="g2">
       <label>Ciudad<input name="ciudad" maxlength="100"></label>
@@ -351,7 +365,7 @@ async function cargarPropiedades(){
   var tb=document.getElementById('tbProps'),m=document.getElementById('msgProps');
   var r=await db.from('propiedades').select('*').order('created_at',{ascending:false});
   tb.textContent='';m.textContent='';
-  function fila(t){var tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=8;td.textContent=t;tr.appendChild(td);tb.appendChild(tr)}
+  function fila(t){var tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=9;td.textContent=t;tr.appendChild(td);tb.appendChild(tr)}
   if(r.error){fila('No se pudo cargar la lista de propiedades. ¿Has ejecutado supabase-propiedades.sql?');return}
   document.getElementById('nProps').textContent=r.data.filter(function(p){return p.estado==='publicada'}).length;
   if(!r.data.length){fila('Aún no hay propiedades. Pulsa «Añadir propiedad».');return}
@@ -360,7 +374,7 @@ async function cargarPropiedades(){
     var tf=document.createElement('td');
     if(p.fotos&&p.fotos.length){var im=document.createElement('img');im.src=db.storage.from(BUCKET).getPublicUrl(p.fotos[0]).data.publicUrl;im.alt='';im.width=56;im.height=42;im.style.objectFit='cover';tf.appendChild(im)}else{tf.textContent='—'}
     tr.appendChild(tf);
-    [p.tipo,p.ubicacion,p.ciudad+', '+p.pais,Number(p.metros).toLocaleString('es-ES')+' m²',dinero(p.precio,p.moneda)].forEach(function(t){
+    [p.codigo||'—',p.tipo+' · '+(p.operacion==='alquiler'?'Alquiler':'Venta'),p.ubicacion,p.ciudad+', '+p.pais,Number(p.metros).toLocaleString('es-ES')+' m²',dinero(p.precio,p.moneda)+(p.operacion==='alquiler'?' /mes':'')].forEach(function(t){
       var td=document.createElement('td');td.textContent=t;tr.appendChild(td);
     });
     var te=document.createElement('td'),sel=document.createElement('select');
@@ -391,15 +405,24 @@ document.getElementById('cancelProp').addEventListener('click',function(){dlg.cl
 formProp.addEventListener('submit',async function(ev){
   ev.preventDefault();errProp.textContent='';
   var x=formProp.elements;
-  var d={tipo:x.tipo.value,metros:Number(x.metros.value),ubicacion:x.ubicacion.value.trim(),ciudad:x.ciudad.value.trim(),pais:x.pais.value.trim(),precio:Number(x.precio.value),moneda:x.moneda.value,estado:x.estado.value};
-  if(!(d.metros>0)){errProp.textContent='Indica los metros cuadrados (mayor que 0).';return}
+  var anio=x.anio.value.trim();
+  var d={codigo:x.codigo.value.trim(),operacion:x.operacion.value,tipo:x.tipo.value,condicion:x.condicion.value,
+    metros:Number(x.metros.value),anio_construccion:anio===''?null:Number(anio),
+    habitaciones:x.habitaciones.value===''?0:Number(x.habitaciones.value),banos:x.banos.value===''?0:Number(x.banos.value),
+    garaje:x.garaje.value==='si',trastero:x.trastero.value==='si',
+    ubicacion:x.ubicacion.value.trim(),ciudad:x.ciudad.value.trim(),pais:x.pais.value.trim(),
+    precio:Number(x.precio.value),moneda:x.moneda.value,estado:x.estado.value};
+  if(!d.codigo||d.codigo.length>30){errProp.textContent='Escribe el código del inmueble (máximo 30 caracteres).';return}
+  if(!(d.metros>0)){errProp.textContent='Indica el área construida en m² (mayor que 0).';return}
+  if(!Number.isInteger(d.habitaciones)||d.habitaciones<0||d.habitaciones>50||!Number.isInteger(d.banos)||d.banos<0||d.banos>50){errProp.textContent='Habitaciones y baños deben ser números enteros (0 o más).';return}
+  if(d.anio_construccion!==null&&(!Number.isInteger(d.anio_construccion)||d.anio_construccion<1800||d.anio_construccion>2100)){errProp.textContent='El año de construcción debe estar entre 1800 y 2100.';return}
   if(x.precio.value===''||!(d.precio>=0)){errProp.textContent='Indica un precio válido.';return}
   if(!d.ubicacion||!d.ciudad||!d.pais){errProp.textContent='Rellena la ubicación, la ciudad y el país.';return}
   var files=Array.prototype.slice.call(x.fotos.files);
   if(files.length>MAX_FOTOS){errProp.textContent='Puedes subir como máximo '+MAX_FOTOS+' fotos.';return}
   var b=document.getElementById('saveProp');b.disabled=true;b.textContent='Guardando…';
   var r=await db.from('propiedades').insert(d).select('id').single();
-  if(r.error){b.disabled=false;b.textContent='Guardar';errProp.textContent='No se pudo guardar. Comprueba los datos e inténtalo de nuevo.';return}
+  if(r.error){b.disabled=false;b.textContent='Guardar';errProp.textContent=r.error.code==='23505'?'Ya existe una propiedad con ese código.':'No se pudo guardar. Comprueba los datos e inténtalo de nuevo.';return}
   var rutas=[],fallos=0;
   for(var i=0;i<files.length;i++){
     try{
