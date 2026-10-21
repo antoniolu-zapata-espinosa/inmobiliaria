@@ -5,5 +5,5 @@
    Si dejas los dos campos vacíos, las páginas funcionan en modo demostración. */
 window.CFG={
   supabaseUrl:'https://vxarztazgxfsgtcevnvq.supabase.co',
-  supabaseAnonKey:''
+  supabaseAnonKey:'sb_publishable_2O0PdHW9UxqHPkVKUY770w_FgPYPYEf'
 };
