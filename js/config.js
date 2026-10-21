@@ -4,6 +4,6 @@
    NUNCA pongas aquí la clave "service_role" ni la "secret".
    Si dejas los dos campos vacíos, las páginas funcionan en modo demostración. */
 window.CFG={
-  supabaseUrl:'',
+  supabaseUrl:'https://vxarztazgxfsgtcevnvq.supabase.co',
   supabaseAnonKey:''
 };
